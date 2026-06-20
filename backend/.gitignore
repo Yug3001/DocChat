@@ -1,0 +1,30 @@
+# Secrets — never commit these
+.env
+
+# Local data directories (ephemeral on Render; persisted via Render Disk in prod)
+chroma_db/
+storage/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# ML model caches (downloaded at runtime)
+.cache/
+models_cache/
+
+# OS
+.DS_Store
+Thumbs.db

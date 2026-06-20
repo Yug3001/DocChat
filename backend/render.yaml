@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: docchat-backend
+    env: python
+    region: oregon
+    plan: starter          # change to 'free' if you want the free tier (slower spin-up)
+    buildCommand: >
+      apt-get update -y &&
+      apt-get install -y tesseract-ocr &&
+      pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    # ── Persistent disk (keeps ChromaDB + uploads across deploys) ──────────────
+    disk:
+      name: docchat-data
+      mountPath: /data      # everything under /data survives redeploys
+      sizeGB: 1             # ~$0.25 / GB / month; increase if needed
+
+    envVars:
+      # ── Set these in Render dashboard (mark as "secret") ──────────────────────
+      - key: GROQ_API_KEY
+        sync: false          # you enter the value in the Render dashboard
+
+      - key: DATABASE_URL
+        sync: false          # paste your Render PostgreSQL External URL here
+
+      - key: FRONTEND_URL
+        sync: false          # paste your Vercel deployment URL e.g. https://docchat.vercel.app
+
+      # ── Static values ─────────────────────────────────────────────────────────
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+
+      - key: RERANKER_MODEL
+        value: cross-encoder/ms-marco-MiniLM-L-6-v2
+
+      # ── Paths on the persistent disk (replaces ./chroma_db and ./storage) ────
+      - key: CHROMA_PATH
+        value: /data/chroma_db
+
+      - key: STORAGE_PATH
+        value: /data/storage
